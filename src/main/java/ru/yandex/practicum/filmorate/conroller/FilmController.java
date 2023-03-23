@@ -4,12 +4,14 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.NoUpdateException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class FilmController {
@@ -18,71 +20,49 @@ public class FilmController {
     static int count = 0;
 
     @PostMapping("/films")
-    public Film addFilm(@RequestBody Film film) {
-
-        if (checkValidateFilm(film)) {
-            count++;
-            film.setId(count);
-            films.put(film.getId(), film);
-        } else {
-            throw new ValidationException("Ошибка валидации");
-        }
+    public Film addFilm(@Valid @RequestBody Film film) {
+        checkValidateFilm(film);
+        count++;
+        film.setId(count);
+        films.put(film.getId(), film);
         return film;
-
     }
 
 
     @PutMapping("/films")
-    public Film updateFilm(@RequestBody Film film) {
-
-        if (checkValidateFilm(film)) {
-            if (films.containsKey(film.getId())) {
-                films.put(film.getId(), film);
-            } else {
-                throw new NoUpdateException("Ошибка Update");
-            }
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        if (films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
         } else {
-            throw new ValidationException("Ошибка валидации");
+            throw new NoUpdateException("Ошибка Update");
         }
         return film;
-
     }
 
 
     @GetMapping("/films")
     public List<Film> findAllFilms() {
-        List<Film> filmList = new ArrayList<>();
-        for (Film film:films.values()) {
-            filmList.add(film);
-        }
-        return filmList;
+        return new ArrayList<>(films.values());
     }
 
     public boolean checkValidateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            return false;
+            throw new ValidationException("Неверное название фильма");
         }
 
         if (film.getDescription().length() > 200) {
-            return false;
+            throw new ValidationException("Превышена максимальная длина описания фильма");
         }
         LocalDate minimalDate = LocalDate.of(1895, 12, 28);
         if (film.getReleaseDate().isBefore(minimalDate)) {
-            return false;
+            throw new ValidationException("Дата релиза раньше 1895");
         }
 
         if (film.getDuration() <= 0) {
-            return false;
+            throw new ValidationException("Отрицательная продолжительность фильма");
         }
         return true;
+
     }
 
-
-    /*{
-        "id":1,
-        "name": "One",
-        "description": "Oneeeeeeeeeeeeeeeeee",
-        "releaseDate": "2000-10-10",
-        "duration": 120
-    }*/
 }

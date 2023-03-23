@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.conroller.UserController;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -23,7 +24,11 @@ class UserTest {
                 .login("MyLogin")
                 .birthday(LocalDate.of(1990,10,10))
                 .build();
-        assertFalse(userController.checkValidateUser(user));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> userController.checkValidateUser(user)
+        );
+        assertEquals("Ошибка валидации электронной почты",e.getMessage());
     }
 
     @Test
@@ -35,7 +40,11 @@ class UserTest {
                 .login("MyLogin")
                 .birthday(LocalDate.of(1990,10,10))
                 .build();
-        assertFalse(userController.checkValidateUser(user));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> userController.checkValidateUser(user)
+        );
+        assertEquals("Ошибка валидации электронной почты",e.getMessage());
     }
 
     @Test
@@ -47,7 +56,11 @@ class UserTest {
                 .login("")
                 .birthday(LocalDate.of(1990,10,10))
                 .build();
-        assertFalse(userController.checkValidateUser(user));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> userController.checkValidateUser(user)
+        );
+        assertEquals("Ошибка валидации логина",e.getMessage());
     }
 
     @Test
@@ -59,7 +72,11 @@ class UserTest {
                 .login("sasha sasha")
                 .birthday(LocalDate.of(1990,10,10))
                 .build();
-        assertFalse(userController.checkValidateUser(user));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> userController.checkValidateUser(user)
+        );
+        assertEquals("Ошибка валидации логина",e.getMessage());
     }
 
     @Test
@@ -71,7 +88,11 @@ class UserTest {
                 .login("sashaSasha")
                 .birthday(LocalDate.of(2220,10,10))
                 .build();
-        assertFalse(userController.checkValidateUser(user));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> userController.checkValidateUser(user)
+        );
+        assertEquals("Дата рождения не может быть в будущем",e.getMessage());
     }
 
     @Test

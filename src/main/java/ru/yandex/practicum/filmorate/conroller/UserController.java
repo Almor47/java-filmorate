@@ -5,10 +5,13 @@ import ru.yandex.practicum.filmorate.exceptions.NoUpdateException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
@@ -17,73 +20,48 @@ public class UserController {
     static int count = 0;
 
     @PostMapping("/users")
-    public User addUser(@RequestBody User user) {
-
-        if (checkValidateUser(user)) {
-            count++;
-            user.setId(count);
-            users.put(user.getId(), user);
-        } else {
-            throw new ValidationException("Ошибка валидации");
-        }
-
+    public User addUser(@Valid @RequestBody User user) {
+        checkValidateUser(user);
+        count++;
+        user.setId(count);
+        users.put(user.getId(), user);
         return user;
-
     }
 
     @PutMapping("/users")
-    public User updateUser(@RequestBody User user) {
-
-        if (checkValidateUser(user)) {
+    public User updateUser(@Valid @RequestBody User user) {
+        checkValidateUser(user);
             if (users.containsKey(user.getId())) {
                 users.put(user.getId(), user);
             } else {
                 throw new NoUpdateException("Ошибка Update");
             }
-        } else {
-            throw new ValidationException("Ошибка валидации");
-        }
-
         return user;
-
     }
 
     @GetMapping("/users")
     public List<User> findAllUsers() {
-        List<User> userList = new ArrayList<>();
-        for (User user:users.values()) {
-            userList.add(user);
-        }
-        return userList;
+        return new ArrayList<>(users.values());
     }
 
     public boolean checkValidateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !(user.getEmail().contains("@"))) {
-            return false;
+            throw new ValidationException("Ошибка валидации электронной почты");
         }
 
         if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            return false;
+            throw new ValidationException("Ошибка валидации логина");
         }
 
         if (user.getBirthday().isAfter(LocalDate.now())) {
-            return false;
+            throw new ValidationException("Дата рождения не может быть в будущем");
         }
 
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
 
-
         return true;
     }
 
-
-    /*id{
-        "id":3,
-            "email": "fdsfsdfsdf@ndex.ru",
-            "login": "Masha",
-            "name": "",
-            "birthday": "2024-02-08"
-    }*/
 }

@@ -3,12 +3,12 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.conroller.FilmController;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class FilmTest {
@@ -24,7 +24,12 @@ class FilmTest {
                 .releaseDate(LocalDate.of(1980,10,10))
                 .duration(150)
                 .build();
-        assertFalse(filmController.checkValidateFilm(film));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> filmController.checkValidateFilm(film)
+        );
+        assertEquals("Неверное название фильма",e.getMessage());
+
     }
 
     @Test
@@ -40,7 +45,12 @@ class FilmTest {
                 .releaseDate(LocalDate.of(1980,10,10))
                 .duration(150)
                 .build();
-        assertFalse(filmController.checkValidateFilm(film));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> filmController.checkValidateFilm(film)
+        );
+        assertEquals("Превышена максимальная длина описания фильма",e.getMessage());
+
     }
 
     @Test
@@ -52,7 +62,11 @@ class FilmTest {
                 .releaseDate(LocalDate.of(1800,10,10))
                 .duration(150)
                 .build();
-        assertFalse(filmController.checkValidateFilm(film));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> filmController.checkValidateFilm(film)
+        );
+        assertEquals("Дата релиза раньше 1895",e.getMessage());
     }
 
     @Test
@@ -64,7 +78,11 @@ class FilmTest {
                 .releaseDate(LocalDate.of(1980,10,10))
                 .duration(-100)
                 .build();
-        assertFalse(filmController.checkValidateFilm(film));
+        ValidationException e = assertThrows(
+                ValidationException.class,
+                () -> filmController.checkValidateFilm(film)
+        );
+        assertEquals("Отрицательная продолжительность фильма",e.getMessage());
     }
 
     @Test
