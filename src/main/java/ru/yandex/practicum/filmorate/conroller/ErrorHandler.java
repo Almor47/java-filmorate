@@ -15,13 +15,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFound(NotFoundException e) {
-        return new ErrorResponse("NOT_FOUND",e.getMessage());
+        return new ErrorResponse("NOT_FOUND", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleOtherException(NoUpdateException e) {
-        return new ErrorResponse("OtherException",e.getMessage());
+        return new ErrorResponse("OtherException", e.getMessage());
     }
 
 }
