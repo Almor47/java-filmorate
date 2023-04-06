@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exceptions.NoUpdateException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.List;
 public class InMemoryUserStorage implements UserStorage {
 
     static int count = 0;
-    public HashMap<Long,User> users = new HashMap<>();
+    public HashMap<Long, User> users = new HashMap<>();
 
     @Override
     public User addUser(User user) {
