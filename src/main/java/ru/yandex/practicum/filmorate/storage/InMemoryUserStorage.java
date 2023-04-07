@@ -16,7 +16,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        checkValidateUser(user);
+        setNameIfUnspecified(user);
         count++;
         user.setId(count);
         users.put(user.getId(), user);
@@ -25,7 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        checkValidateUser(user);
+        setNameIfUnspecified(user);
         if (users.containsKey(user.getId())) {
             users.put(user.getId(), user);
         } else {
@@ -39,20 +39,10 @@ public class InMemoryUserStorage implements UserStorage {
         return new ArrayList<>(users.values());
     }
 
-    public boolean checkValidateUser(User user) {
-
-        /*if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Ошибка валидации логина");
-        }*/
-        /*if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }*/
-
+    public void setNameIfUnspecified(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-
-        return true;
     }
 
 }
