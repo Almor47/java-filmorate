@@ -39,8 +39,8 @@ public class FilmDbStorage implements FilmStorage {
         String description = rs.getString("FILM_DESCRIPTION");
         LocalDate releaseDate = rs.getDate("FILM_RELEASEDATE").toLocalDate();
         int duration = rs.getInt("FILM_DURATION");
-        Film film = Film.builder().id(id).name(name).description(description).releaseDate(releaseDate).
-                duration(duration).mpa(Mpa.builder().id(rs.getInt("MPA_ID"))
+        Film film = Film.builder().id(id).name(name).description(description).releaseDate(releaseDate)
+                        .duration(duration).mpa(Mpa.builder().id(rs.getInt("MPA_ID"))
                         .name(rs.getString("RATING_NAME")).build()).build();
 
         String sql1 = "select USER_ID from likes where FILM_ID = ?";
