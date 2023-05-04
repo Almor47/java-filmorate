@@ -38,3 +38,4 @@ mvnw.cmd
 *.class
 *.jar
 *.DS_Store
+db/*
