@@ -39,3 +39,4 @@ mvnw.cmd
 *.jar
 *.DS_Store
 db/*
+*.db
