@@ -1,20 +1,9 @@
---INSERT INTO USERS(EMAIL,LOGIN,NAME,BIRTHDAY)
---VALUES ('alex@yandex.ru','login1','name1','2000-10-10');
-
 INSERT INTO FILMS_RATING(RATING_NAME)
 VALUES ('G'),('PG'),('PG-13'),('R'),('NC-17');
-
---INSERT INTO FILMS (FILM_NAME,FILM_DESCRIPTION,FILM_RELEASEDATE,FILM_DURATION,MPA_ID)
---VALUES ('Avatar','GoodFilm','2000-10-10',200,2),('Transformer','BESTTTTTT','2008-10-10',150,1);
 
 INSERT INTO GENRE (GENRE_NAME)
 VALUES ('Комедия'),('Драма'),('Мультфильм'),('Триллер'),('Документальный'),('Боевик');
 
---INSERT INTO FILM_GENRE (FILM_ID,GENRE_ID)
---VALUES (1,1),(1,2),(1,3),(2,1);
-
---INSERT INTO FRIENDSHIP_STATUS(FRIENDSHIP_NAME)
---VALUES ('неподтв'),('подтв');
 
 
 
