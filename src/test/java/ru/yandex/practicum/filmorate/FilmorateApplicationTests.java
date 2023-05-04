@@ -138,7 +138,7 @@ class FilmorateApplicationTests {
     }
 
     @Test
-    public void ListFriends() {
+    public void alllistFriends() {
         userDbStorage.addFriends(1L, 2L);
         List<User> friendsList = userDbStorage.getListFriends(1L);
         assertEquals(2L, friendsList.get(0).getId());
