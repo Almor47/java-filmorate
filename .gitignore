@@ -27,9 +27,7 @@ target/
 *.ipr
 
 ### Maven ###
-.mvn
-mvnw
-mvnw.cmd
+
 
 ### NetBeans ###
 /nbproject/private/
