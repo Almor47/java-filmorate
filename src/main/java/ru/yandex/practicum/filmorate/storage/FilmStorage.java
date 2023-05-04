@@ -6,10 +6,19 @@ import java.util.List;
 
 public interface FilmStorage {
 
+    List<Film> findAllFilms();
+
+    List<Film> getPopularFilms(long count);
+
     Film addFilm(Film film);
 
     Film updateFilm(Film film);
 
-    List<Film> findAllFilms();
+    Film findFilm(long id);
+
+    void putLike(long id, long userId);
+
+    void deleteLike(long id, long userId);
+
 
 }

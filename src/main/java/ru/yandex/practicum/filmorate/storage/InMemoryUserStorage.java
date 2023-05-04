@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-@Component
-public class InMemoryUserStorage implements UserStorage {
-
+//@Component
+//public class InMemoryUserStorage implements UserStorage {
+/*
     static int count = 0;
     public HashMap<Long, User> users = new HashMap<>();
 
@@ -43,6 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-    }
+    }*/
 
-}
+
+//}

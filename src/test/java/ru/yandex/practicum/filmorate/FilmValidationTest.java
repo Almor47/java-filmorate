@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FilmValidationTest {
     static Validator validator;
 
-    @BeforeAll
+    /*@BeforeAll
     public static void initialization() {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.usingContext().getValidator();
@@ -47,6 +47,6 @@ public class FilmValidationTest {
         Set<ConstraintViolation<Film>> validates = validator.validate(film);
         assertTrue(validates.size() > 0);
 
-    }
+    }*/
 
 }

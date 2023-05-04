@@ -1,71 +1,53 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
 
-    private final InMemoryUserStorage inMemoryUserStorage;
+    private final UserStorage userStorage;
 
-    public User addFriends(long id, long friendId) {
-
-        if (inMemoryUserStorage.users.get(id) == null || inMemoryUserStorage.users.get(friendId) == null) {
-            throw new NotFoundException("Пользователя с таким ID не существует");
-        }
-        inMemoryUserStorage.users.get(id).getFriends().add(friendId);
-        inMemoryUserStorage.users.get(friendId).getFriends().add(id);
-        return inMemoryUserStorage.users.get(id);
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
     }
 
-    public User deleteFriends(long id, long friendId) {
-
-        if (inMemoryUserStorage.users.get(id).getFriends().contains(friendId)) {
-            inMemoryUserStorage.users.get(id).getFriends().remove(friendId);
-            inMemoryUserStorage.users.get(friendId).getFriends().remove(id);
-        } else {
-            throw new NotFoundException("Пользователя с таким ID не существует");
+    public User addUser(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
-        return inMemoryUserStorage.users.get(id);
+        return userStorage.addUser(user);
     }
 
-    public Set<User> getListFriends(long id) {
-        Set<User> listFriends = new HashSet<>();
-        for (Long user : inMemoryUserStorage.users.get(id).getFriends()) {
-            listFriends.add(inMemoryUserStorage.users.get(user));
-        }
-        return listFriends;
+    public User updateUser(User user) {
+        return userStorage.updateUser(user);
     }
 
-    public Set<User> getCommonListFriends(long id, long otherId) {
-        Set<User> commonFriendList = new HashSet<>();
-        if (inMemoryUserStorage.users.get(id) == null || inMemoryUserStorage.users.get(otherId) == null) {
-            throw new NotFoundException("Пользователя с таким ID не существует");
-        }
-        if (inMemoryUserStorage.users.get(id).getFriends().size() == 0 ||
-                inMemoryUserStorage.users.get(otherId).getFriends().size() == 0) {
-            return commonFriendList;
-        }
-        for (Long friendId : inMemoryUserStorage.users.get(id).getFriends()) {
-            if (inMemoryUserStorage.users.get(otherId).getFriends().contains(friendId)) {
-                commonFriendList.add(inMemoryUserStorage.users.get(friendId));
-            }
-        }
-        return commonFriendList;
+    public List<User> findAllUsers() {
+        return userStorage.findAllUsers();
     }
 
     public User findUser(long id) {
-        if (inMemoryUserStorage.users.get(id) == null) {
-            throw new NotFoundException("Пользователя с таким ID не существует");
-        }
-        return inMemoryUserStorage.users.get(id);
+        return userStorage.findUser(id);
+    }
+
+    public void addFriends(long id, long friendId) {
+        userStorage.addFriends(id, friendId);
+    }
+
+    public List<User> getListFriends(long id) {
+        return userStorage.getListFriends(id);
+    }
+
+    public void deleteFriends(long id, long friendId) {
+        userStorage.deleteFriends(id, friendId);
+    }
+
+    public List<User> getCommonListFriends(long id, long otherId) {
+        return userStorage.getCommonListFriends(id, otherId);
     }
 
 }
