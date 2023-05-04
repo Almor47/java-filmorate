@@ -40,7 +40,8 @@ public class FilmDbStorage implements FilmStorage {
         LocalDate releaseDate = rs.getDate("FILM_RELEASEDATE").toLocalDate();
         int duration = rs.getInt("FILM_DURATION");
         Film film = Film.builder().id(id).name(name).description(description).releaseDate(releaseDate).
-                duration(duration).mpa(Mpa.builder().id(rs.getInt("MPA_ID")).name(rs.getString("RATING_NAME")).build()).build();
+                duration(duration).mpa(Mpa.builder().id(rs.getInt("MPA_ID"))
+                        .name(rs.getString("RATING_NAME")).build()).build();
 
         String sql1 = "select USER_ID from likes where FILM_ID = ?";
         List<Long> userLikes = jdbcTemplate.query(sql1, (rss, rowNum) -> makeUserId(rss), id);
@@ -62,7 +63,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {
-        return Genre.builder().id(rs.getInt("GENRE_ID")).name(rs.getString("GENRE_NAME")).build();
+        return Genre.builder().id(rs.getInt("GENRE_ID"))
+                .name(rs.getString("GENRE_NAME")).build();
     }
 
     private Long makeUserId(ResultSet rss) throws SQLException {
@@ -151,7 +153,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void putLike(long id, long userId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbUserId = jdbcTemplate.queryForObject(sql1, new Object[]{userId}, (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbUserId = jdbcTemplate.queryForObject(sql1, new Object[]{userId},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
         String sql = "insert into LIKES(USER_ID,FILM_ID) values(?,?)";
         jdbcTemplate.update(sql, dbUserId, id);
     }
@@ -159,7 +162,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void deleteLike(long id, long userId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbUserId = jdbcTemplate.queryForObject(sql1, new Object[]{userId}, (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbUserId = jdbcTemplate.queryForObject(sql1, new Object[]{userId},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
         String sql = "delete from LIKES where USER_ID = ? and FILM_ID = ?";
         jdbcTemplate.update(sql, dbUserId, id);
     }

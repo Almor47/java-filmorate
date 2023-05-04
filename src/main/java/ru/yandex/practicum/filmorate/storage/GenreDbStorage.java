@@ -30,6 +30,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {
-        return Genre.builder().id(rs.getInt("GENRE_ID")).name(rs.getString("GENRE_NAME")).build();
+        return Genre.builder().id(rs.getInt("GENRE_ID"))
+                .name(rs.getString("GENRE_NAME")).build();
     }
 }

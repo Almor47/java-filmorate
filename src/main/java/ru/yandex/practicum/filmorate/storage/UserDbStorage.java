@@ -73,8 +73,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void addFriends(long id, long friendId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id}, (rs, rowNum) -> rs.getLong("USER_ID"));
-        long dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId}, (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
         String sql2 = "insert into FRIENDSHIP(USER_ID,FRIEND_ID) values (?,?)";
         jdbcTemplate.update(sql2, dbId, dbfriendId);
     }
@@ -82,7 +84,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getListFriends(long id) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id}, (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
         String sql2 = "select * from USERS where USER_ID in (select f.FRIEND_ID from USERS u join FRIENDSHIP f" +
                 " on u.USER_ID = f.USER_ID where f.USER_ID = ?)";
         return jdbcTemplate.query(sql2, (rs, rowNum) -> makeUser(rs), dbId);
@@ -91,8 +94,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void deleteFriends(long id, long friendId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id}, (rs, rowNum) -> rs.getLong("USER_ID"));
-        long dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId}, (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
         String sql2 = "delete from FRIENDSHIP where USER_ID = ? AND FRIEND_ID = ?";
         jdbcTemplate.update(sql2, dbId, dbfriendId);
     }
@@ -100,9 +105,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getCommonListFriends(long id, long otherId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id}, (rs, rowNum) -> rs.getLong("USER_ID"));
-        long dbOtherId = jdbcTemplate.queryForObject(sql1, new Object[]{otherId}, (rs, rowNum) -> rs.getLong("USER_ID"));
-        String sql2 = "select * from USERS where USER_ID in (select distinct FRIEND_ID from FRIENDSHIP where FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?) and FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?))";
+        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
+        long dbOtherId = jdbcTemplate.queryForObject(sql1, new Object[]{otherId},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
+        String sql2 = "select * from USERS where USER_ID in (select distinct FRIEND_ID from FRIENDSHIP " +
+                "where FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?) and " +
+                "FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?))";
         return jdbcTemplate.query(sql2, (rs, rowNum) -> makeUser(rs), dbId, dbOtherId);
     }
 }
