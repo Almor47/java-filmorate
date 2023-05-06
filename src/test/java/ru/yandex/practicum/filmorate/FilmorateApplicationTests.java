@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -161,7 +162,7 @@ class FilmorateApplicationTests {
     @Test
     public void deleteUserById() {
         userDbStorage.deleteUserById(1L);
-        assertThrows(EmptyResultDataAccessException.class,
+        assertThrows(NotFoundException.class,
                 () -> userDbStorage.findUser(1L));
     }
 
