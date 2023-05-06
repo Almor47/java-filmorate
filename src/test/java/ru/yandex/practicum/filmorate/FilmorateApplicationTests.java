@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.EmptyResultDataAccessException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -150,9 +152,17 @@ class FilmorateApplicationTests {
         assertEquals(2L, commonFriendsList.get(0).getId());
     }
 
+
     @Test
     public void testFindUserById() {
         assertEquals(user3.getName(), userDbStorage.findUser(3L).getName());
+    }
+
+    @Test
+    public void deleteUserById() {
+        userDbStorage.deleteUserById(1L);
+        assertThrows(EmptyResultDataAccessException.class,
+                () -> userDbStorage.findUser(1L));
     }
 
 }

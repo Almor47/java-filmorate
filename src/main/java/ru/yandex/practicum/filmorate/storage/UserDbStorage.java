@@ -4,6 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NoUpdateException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -41,12 +43,17 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long id = jdbcTemplate.queryForObject(sql1, new Object[]{user.getId()}, (rs, rowNum) ->
-                rs.getLong("USER_ID"));
-        String sql2 = "update USERS set LOGIN = ?, NAME = ?, EMAIL = ?, BIRTHDAY = ? where USER_ID = ?";
-        jdbcTemplate.update(sql2, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), id);
-        return user;
+        try {
+            String sql1 = "select USER_ID from USERS where USER_ID = ?";
+            long id = jdbcTemplate.queryForObject(sql1, new Object[]{user.getId()}, (rs, rowNum) ->
+                    rs.getLong("USER_ID"));
+            String sql2 = "update USERS set LOGIN = ?, NAME = ?, EMAIL = ?, BIRTHDAY = ? where USER_ID = ?";
+            jdbcTemplate.update(sql2, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), id);
+            return user;
+        } catch (Exception e) {
+            throw new NoUpdateException("Невозможно обновить данные пользователя с id = " + user.getId());
+        }
+
     }
 
     @Override
@@ -66,19 +73,44 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findUser(long id) {
-        String sql = "select * from USERS where USER_ID = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNUm) -> makeUser(rs), id);
+        try {
+            String sql = "select * from USERS where USER_ID = ?";
+            return jdbcTemplate.queryForObject(sql, (rs, rowNUm) -> makeUser(rs), id);
+        } catch (Exception e) {
+            throw new NotFoundException("Пользователь с id = " + id + "не найден.");
+        }
     }
 
     @Override
     public void addFriends(long id, long friendId) {
         String sql1 = "select USER_ID from USERS where USER_ID = ?";
-        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
-                (rs, rowNum) -> rs.getLong("USER_ID"));
-        long dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId},
-                (rs, rowNum) -> rs.getLong("USER_ID"));
-        String sql2 = "insert into FRIENDSHIP(USER_ID,FRIEND_ID) values (?,?)";
-        jdbcTemplate.update(sql2, dbId, dbfriendId);
+        Long dbId = null;
+        Long dbfriendId = null;
+        try {
+            dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                    (rs, rowNum) -> rs.getLong("USER_ID"));
+        } catch (Exception e) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден.");
+        }
+
+        try {
+            dbfriendId = jdbcTemplate.queryForObject(sql1, new Object[]{friendId},
+                    (rs, rowNum) -> rs.getLong("USER_ID"));
+        } catch (Exception e) {
+            throw new NotFoundException("Пользователь с id = " + friendId + " не найден.");
+        }
+
+        String sql2 = "select USER_ID from FRIENDSHIP where USER_ID = ? AND FRIEND_ID = ?";
+        try {
+            jdbcTemplate.queryForObject(sql2,new Object[]{dbId,dbfriendId},
+                    (rs, rowNum) -> rs.getLong("USER_ID"));
+            System.out.println("У пользователя с айди - " + dbId + " уже существует друг с айди - " + dbfriendId);
+        } catch (Exception e) {
+            String sql3 = "insert into FRIENDSHIP(USER_ID,FRIEND_ID) values (?,?)";
+            jdbcTemplate.update(sql3, dbId, dbfriendId);
+        }
+
+
     }
 
     @Override
@@ -113,5 +145,16 @@ public class UserDbStorage implements UserStorage {
                 "where FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?) and " +
                 "FRIEND_ID in (select FRIEND_ID from FRIENDSHIP where USER_ID = ?))";
         return jdbcTemplate.query(sql2, (rs, rowNum) -> makeUser(rs), dbId, dbOtherId);
+    }
+
+    @Override
+    public void deleteUserById(long id) {
+        String sql1 = "select USER_ID from USERS where USER_ID = ?";
+        long dbId = jdbcTemplate.queryForObject(sql1, new Object[]{id},
+                (rs, rowNum) -> rs.getLong("USER_ID"));
+        String sql3 = "delete from FRIENDSHIP where USER_ID = ? OR FRIEND_ID = ?";
+        jdbcTemplate.update(sql3,dbId,dbId);
+        String sql2 = "delete from USERS  where USER_ID = ?";
+        jdbcTemplate.update(sql2,dbId);
     }
 }

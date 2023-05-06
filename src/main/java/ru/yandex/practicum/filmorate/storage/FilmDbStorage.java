@@ -4,6 +4,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.NoUpdateException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -128,26 +130,34 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        String sqlOut = "select FILM_ID from FILMS where FILM_ID = ?";
-        long id = jdbcTemplate.queryForObject(sqlOut, new Object[]{film.getId()}, (rs, rowNum) ->
-                rs.getLong("FILM_ID"));
-        String sqlIn = "update FILMS set FILM_NAME = ?, FILM_DESCRIPTION = ?, FILM_RELEASEDATE = ?, " +
-                "FILM_DURATION = ?, MPA_ID = ? where FILM_ID = ?";
-        jdbcTemplate.update(sqlIn, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getMpa().getId(), id);
-        String sqlDelete = "delete from FILM_GENRE where FILM_ID = ?";
-        jdbcTemplate.update(sqlDelete, film.getId());
-        String sql = "insert into FILM_GENRE(FILM_ID,GENRE_ID) values (?,?)";
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(sql, id, genre.getId());
+        try {
+            String sqlOut = "select FILM_ID from FILMS where FILM_ID = ?";
+            long id = jdbcTemplate.queryForObject(sqlOut, new Object[]{film.getId()}, (rs, rowNum) ->
+                    rs.getLong("FILM_ID"));
+            String sqlIn = "update FILMS set FILM_NAME = ?, FILM_DESCRIPTION = ?, FILM_RELEASEDATE = ?, " +
+                    "FILM_DURATION = ?, MPA_ID = ? where FILM_ID = ?";
+            jdbcTemplate.update(sqlIn, film.getName(), film.getDescription(), film.getReleaseDate(),
+                    film.getDuration(), film.getMpa().getId(), id);
+            String sqlDelete = "delete from FILM_GENRE where FILM_ID = ?";
+            jdbcTemplate.update(sqlDelete, film.getId());
+            String sql = "insert into FILM_GENRE(FILM_ID,GENRE_ID) values (?,?)";
+            for (Genre genre : film.getGenres()) {
+                jdbcTemplate.update(sql, id, genre.getId());
+            }
+            return film;
+        } catch (Exception e) {
+            throw new NoUpdateException("Невозможно обновить данные фильма с id = " + film.getId());
         }
-        return film;
     }
 
     @Override
     public Film findFilm(long id) {
-        String sql = "select * from FILMS f JOIN FILMS_RATING fr ON f.MPA_ID = fr.MPA_ID where FILM_ID = ?";
-        return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, intNum) -> makeFilm(rs));
+        try {
+            String sql = "select * from FILMS f JOIN FILMS_RATING fr ON f.MPA_ID = fr.MPA_ID where FILM_ID = ?";
+            return jdbcTemplate.queryForObject(sql, new Object[]{id}, (rs, intNum) -> makeFilm(rs));
+        } catch (Exception e) {
+            throw new NotFoundException("Фильм с id = " + id + "не найден.");
+        }
     }
 
     @Override
