@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.conroller;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,13 +16,20 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFound(NotFoundException e) {
-        return new ErrorResponse("NOT_FOUND", e.getMessage());
+        return new ErrorResponse("NotFoundException", e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleOtherException(NoUpdateException e) {
-        return new ErrorResponse("OtherException", e.getMessage());
+        return new ErrorResponse("NoUpdateException", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleEmptyResultDataAccessException(EmptyResultDataAccessException e) {
+        return new ErrorResponse("Данных в БД нет",e.getMessage());
+    }
+
 
 }
